@@ -1,0 +1,160 @@
+import solicitantes.*
+import empresas.*
+import profesional.*
+
+
+    const universidadSanMartin = new Universidad(
+            provincia = "Buenos Aires",
+            honorarioRecomendado = 3500
+        )
+
+    const universidadRosario = new Universidad(
+            provincia = "Santa Fe",
+            honorarioRecomendado = 2800
+        )
+
+    const universidadCorriente = new Universidad(
+            provincia = "Corrientes",
+            honorarioRecomendado = 4200
+        )
+
+    const universidadHurlingham = new Universidad(
+            provincia="Buenos Aires",
+            honorarioRecomendado = 8800
+        )
+    
+    const juana = new ProfesionalVinculado(
+            universidad = universidadRosario
+    )
+
+    const melina = new ProfesionalAsociado(
+            universidad = universidadCorriente
+    )
+
+     const rocio = new ProfesionalLibre(
+            universidad = universidadHurlingham,
+            honorarios = 5000,
+            provinciasHabilitadas = ["Santa Fe", "Cordoba", "Buenos Aires"]
+    )
+
+
+
+    
+    const luciana = new ProfesionalLibre(
+            universidad = universidadRosario,
+            honorarios = 3200,
+            provinciasHabilitadas = ["Santa fe", "Entre rios"]
+        )
+
+    const empresa = new Empresa(
+            honorariosDeReferencia = 3500
+        )
+
+describe "test de la etapa 1" {
+
+    test "San Martín: está en la provincia de Buenos Aires, los honorarios recomendados son de 3500 pesos." {
+        assert.equals(3500,universidadSanMartin.honorarioRecomendado())
+        assert.equals("Buenos Aires",universidadSanMartin.provincia())
+    }
+
+    test "Rosario: está en la provincia de Santa Fe, los honorarios recomendados son de 2800 pesos."{
+        assert.equals(2800, universidadRosario.honorarioRecomendado())
+        assert.equals("Santa Fe", universidadRosario.provincia())
+    }
+    test "Corrientes: está en la provincia de Corrientes, los honorarios recomendados son de 4200 pesos."{
+        assert.equals(4200, universidadCorriente.honorarioRecomendado())
+        assert.equals("Corrientes", universidadCorriente.provincia())
+    }
+    test "Hurlingham: está en la provincia de Buenos Aires, los honorarios recomendados son de 8800 pesos. "{
+        
+        assert.equals(8800, universidadHurlingham.honorarioRecomendado())
+        assert.equals("Buenos Aires", universidadHurlingham.provincia())
+    }
+
+    //PROFESIONALES
+   test "Juana, vinculada, estudió en la Univ. de Rosario." {
+        assert.equals(universidadRosario, juana.universidad())
+        assert.equals(2800, juana.honorariosPorHora())
+        assert.equals(["Santa Fe"], juana.provincias())
+    }
+    test "Melina, asociada del Litoral, estudió en la Univ. de Corrientes." {
+
+        assert.equals(universidadCorriente, melina.universidad())
+        assert.equals(3000, melina.honorariosPorHora())
+        assert.equals( ["Entre rios", "Santa Fe", "Corrientes"],melina.provincias()
+        )
+    }
+
+
+    test "Rocío, libre, estudió en la Univ. de Hurlingham." {
+        assert.equals(universidadHurlingham, rocio.universidad())
+        assert.equals(5000, rocio.honorariosPorHora())
+        assert.equals(["Santa Fe", "Cordoba", "Buenos Aires"], rocio.provincias()
+        )
+    }
+    test "Luciana, libre, estudió en la Univ. de Rosario, honorarios 3200 pesos, puede trabajar en Santa Fe y Entre Ríos. "{
+        
+        assert.equals(universidadRosario, luciana.universidad())
+        assert.equals(3200, luciana.honorariosPorHora())
+        assert.equals(["Santa fe", "Entre rios"], luciana.provincias())
+    }
+
+
+    ///UNA EMPRESA
+    test " cantidad de profesionales por universidad"{
+
+        empresa.agregarProfesional(juana)
+        empresa.agregarProfesional(melina)
+        empresa.agregarProfesional(rocio)
+        empresa.agregarProfesional(luciana)
+
+        assert.equals(2, empresa.cantidadDeProfesionalesDe(universidadRosario))
+        assert.equals(1, empresa.cantidadDeProfesionalesDe(universidadHurlingham))
+        assert.equals(0, empresa.cantidadDeProfesionalesDe(universidadSanMartin))
+    }
+    test "como profesionales caros, solamente a Rocío "{
+        
+        assert.equals([rocio], empresa.profesionalesCaros())
+    }
+    test " como universidades formadoras, a las de Rosario, Corrientes y Hurlingham."{
+        assert.equals([universidadRosario, universidadCorriente, universidadHurlingham].toSet(), empresa.universidadesFormadoras())
+    }
+    test "como profesional más barato a Juana. "{
+        assert.equals(juana, empresa.profesionalMasBarato())
+    }
+    test " empresa de gente acotada"{
+        assert.that(empresa.genteAcotada())
+    }
+
+
+    //etapa 2
+    test "Una persona de Santa Fe puede ser atendida por Juana" {
+    const persona = new Persona(
+        provincia = "Santa Fe"
+    )
+    assert.that(persona.puedeSerAtendidoPor(juana))
+    }
+
+    test "Una institución reconoce la universidad de Rosario" {
+        const intitucion = new Institucion(
+            universidadesReconocidas =[universidadRosario]
+        )
+        assert.that(intitucion.puedeSerAtendidoPor(juana))
+    }
+    test "Un club en Córdoba puede ser atendido por Rocio"{
+        const club = new Club(
+            provincias = ["Cordoba"]
+        )
+        assert.that(club.puedeSerAtendidoPor(rocio))
+    }
+    //etapa 3
+    test " Juana dona la mitad a la universidad"{
+        juana.cobrar(1000)
+        assert.equals(500, universidadRosario.totalDonaciones())
+    }
+    test "melina entrega todo a la asociacion"{
+        melina.cobrar(2000)
+        assert.equals(2000, asociacionDelLitoral.totalRecaudado())
+    }
+    
+}
